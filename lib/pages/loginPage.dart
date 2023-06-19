@@ -2,16 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:libreria_upec/pages/olvidarContrase%C3%B1a.dart';
 import 'package:libreria_upec/pages/paginaBody.dart';
 import 'package:libreria_upec/pages/resgistroCuenta.dart';
 import 'package:libreria_upec/services/authentication.dart';
 
-import 'package:mysql1/mysql1.dart';
 import 'dart:async';
-
-import 'package:quickalert/quickalert.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -224,33 +220,48 @@ class BtnGoogle extends StatefulWidget {
 
 class _BtnGoogleState extends State<BtnGoogle> {
   bool _isPressed = false;
-  // final IngresarConGoogle _auth = IngresarConGoogle();
 
-  Future<UserCredential> signInWithGoogle() async {
+  bool _isSigningIn = false;
+
+  Future<void> _signInWithGoogle() async {
     try {
-      // Trigger the authentication flow
-      final googleUser = await GoogleSignIn().signIn();
+      setState(() {
+        _isSigningIn = true;
+      });
+
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       if (googleUser != null) {
-        // Obtain the auth details from the request
-        final googleAuth = await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
 
-        // Create a new credential
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth?.accessToken,
-          idToken: googleAuth?.idToken,
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
         );
 
-        // Once signed in, return the UserCredential
-        return await FirebaseAuth.instance.signInWithCredential(credential);
-      } else {
-        throw Exception('Inicio de sesión con Google cancelado.');
+        final UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+
+        final User? user = userCredential.user;
+
+        // Hacer algo con el usuario autenticado, como navegar a otra pantalla
+        if (user != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaginaBody(),
+            ),
+          );
+        }
       }
     } catch (e) {
-      // Handle any errors or exceptions
       print('Error en el inicio de sesión con Google: $e');
-      throw Exception(
-          'Error en el inicio de sesión con Google. Por favor, inténtalo de nuevo.');
+      // Manejar el error de inicio de sesión con Google
+    } finally {
+      setState(() {
+        _isSigningIn = false;
+      });
     }
   }
 
@@ -302,18 +313,7 @@ class _BtnGoogleState extends State<BtnGoogle> {
             _isPressed = false;
           });
         },
-        onTap: () {
-          try {
-            signInWithGoogle();
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PaginaBody(),
-                ));
-          } catch (e) {
-            print('Error es: $e');
-          }
-        },
+        onTap: _isSigningIn ? null : _signInWithGoogle,
       ),
     );
   }

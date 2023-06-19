@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 
-class NuevoChat extends StatelessWidget {
-  const NuevoChat({super.key});
+class Notificaciones extends StatefulWidget {
+  const Notificaciones({super.key});
 
+  @override
+  State<Notificaciones> createState() => _NotificacionesState();
+}
+
+class _NotificacionesState extends State<Notificaciones> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Nuevo Chat",
+          "Notificaciones",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Colors.tealAccent,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
     );
   }

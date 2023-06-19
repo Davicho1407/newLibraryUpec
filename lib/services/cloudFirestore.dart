@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ConexionCloudFirestore {
-  final FirebaseFirestore db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseFirestore db = FirebaseFirestore.instance;
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
+class ConexionCloudFirestore {
   Future<void> register(
     String email,
     String password,
